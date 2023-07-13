@@ -1,0 +1,891 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2022-2023 by Jinwen XU
+% ------------------------------------
+%
+% This file may be distributed and/or modified under the conditions of the LaTeX
+% Project Public License, either version 1.3c of this license or (at your option)
+% any later version. The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% \fi
+%
+%<*driver>
+\ProvidesFile{XL-kit.dtx}
+%</driver>
+\NeedsTeXFormat{LaTeX2e}[2022-06-01]
+%
+%<*XL-kit>
+\ProvidesExplPackage
+  {XL-kit}
+  {2023/07/11} {}
+  {Collective interface of XL's toolkit}
+%</XL-kit>
+%
+%<*XL-logo>
+\ProvidesExplPackage
+  {XL-logo}
+  {2023/07/11} {}
+  {The XL logo}
+%</XL-logo>
+%
+%<*XL-math>
+\ProvidesExplPackage
+  {XL-math}
+  {2023/07/11} {}
+  {XL's math configuration}
+%</XL-math>
+%
+%<*XL-text>
+\ProvidesExplPackage
+  {XL-text}
+  {2023/07/11} {}
+  {XL's text configuration}
+%</XL-text>
+%
+%<*XL-management>
+\ProvidesExplPackage
+  {XL-management}
+  {2023/07/11} {}
+  {XL's automatic management for multi-file projects}
+%</XL-management>
+
+%<*XL-kit>
+\keys_define:nn { XL-kit }
+  {
+    , unknown .code:n = {
+                          \PassOptionsToPackage { \CurrentOption } { ProjLib }
+                          \PassOptionsToPackage { \CurrentOption } { XL-logo }
+                          \PassOptionsToPackage { \CurrentOption } { XL-math }
+                          \PassOptionsToPackage { \CurrentOption } { XL-text }
+                          \PassOptionsToPackage { \CurrentOption } { XL-management }
+                        }
+  }
+\ProcessKeyOptions [ XL-kit ]
+
+\RequirePackage { ProjLib }
+\RequirePackage { XL-logo }
+\RequirePackage { XL-math }
+\RequirePackage { XL-text }
+\RequirePackage { XL-management }
+
+\hook_gput_code:nnn { begindocument/before } { XL-kit }
+  {
+    \file_if_exist_input:n { XL-common }
+  }
+%</XL-kit>
+%
+%<*XL-logo>
+\keys_define:nn { XL-logo }
+  {
+    , unknown .code:n = {}
+  }
+\ProcessKeyOptions [ XL-logo ]
+
+\RequirePackage { projlib-paper }
+\RequirePackage { projlib-math }
+
+\RequirePackage { tikz }
+\RequirePackage { anyfontsize }
+
+\hook_gput_code:nnn { begindocument/before } { XL-logo }
+  {
+    \cs_if_exist:cTF { fontspec }
+      {
+        \newfontface \xl_logo_symbol_font: { LinBiolinum_R.otf }
+      }
+      {
+        \RequirePackage [T1] { fontenc }
+        \cs_gset:Nn \xl_logo_symbol_font:
+          { \fontfamily { LinuxBiolinumT-TLF } \selectfont }
+      }
+  }
+
+\NewDocumentCommand \XLlogo {}
+  {
+    \begin{tikzpicture}
+        \clip (0,0) rectangle (1,1);
+        \fill[paper,rounded~corners=.05cm] (0,0) rectangle (1,1);
+        \node[main-text!33!paper] at (.5,.5) { \fontsize{7}{0}\selectfont\xl_logo_symbol_font: \& };
+        \node[main-text!83!paper] at (.25,.75) { \fontsize{14}{0}\selectfont $\mathfrak{X}$ };
+        \node[main-text!83!paper] at (.72,.28) { \fontsize{15}{0}\selectfont $\mathfrak{L}$ };
+        \fill[blue!50!cyan!75!main-text] (.075,.075) -- (.45,.075) -- (.075,.45);
+        \fill[blue!50!cyan!75!main-text] (.925,.925) -- (.55,.925) -- (.925,.55);
+    \end{tikzpicture}
+  }
+%</XL-logo>
+%
+%<*XL-math>
+\keys_define:nn { XL-math }
+  {
+    , quaternion           .bool_set:N = \l__xl_math_quaternion_bool
+    , quaternion           .initial:n  = { false }
+
+    , operator in mathsf   .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operator in mathsf   .initial:n  = { false }
+    , operator-in-mathsf   .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operator~in~mathsf   .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operators in mathsf  .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operators-in-mathsf  .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operators~in~mathsf  .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operator sans serif  .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operator-sans-serif  .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operator~sans~serif  .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operators sans serif .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operators-sans-serif .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+    , operators~sans~serif .bool_set:N = \l__xl_math_operator_in_mathsf_bool
+
+    , fancy functor        .bool_set:N = \l__xl_math_fancy_functor_bool
+    , fancy functor        .initial:n  = { true }
+    , fancy-functor        .bool_set:N = \l__xl_math_fancy_functor_bool
+    , fancy~functor        .bool_set:N = \l__xl_math_fancy_functor_bool
+    , fancy functors       .bool_set:N = \l__xl_math_fancy_functor_bool
+    , fancy-functors       .bool_set:N = \l__xl_math_fancy_functor_bool
+    , fancy~functors       .bool_set:N = \l__xl_math_fancy_functor_bool
+
+    , unknown              .code:n     = {}
+  }
+\ProcessKeyOptions [ XL-math ]
+
+\RequirePackage { projlib-math }
+
+\RequirePackage { tikz-cd }
+\usetikzlibrary { calc }
+\RequirePackage { derivative }
+\RequirePackage { xfrac }
+
+% Add post- and pre- text to \eqref
+\hook_gput_code:nnn { begindocument } { XL-math }
+  {
+    \cs_if_exist:NT \eqref
+      {
+        \RenewDocumentCommand \eqref { O{} O{} m }
+          {
+            \textup { \tagform@ { #2 \ref{#3} #1 } }
+          }
+      }
+  }
+
+% https://tex.stackexchange.com/a/187462
+\NewDocumentCommand \nospacepunct { m } { \makebox[0pt][l]{\,#1} }
+
+
+\NewDocumentCommand \xl_math_decompose_apply:Nnnn { m m m m }
+  {
+    #1{#2} \IfNoValueF{#3}{\sb{#3}} \IfNoValueF{#4}{\sp{#4}}
+  }
+
+
+% \cs_new:Nn \xl_math_operator_style:n { \mathrm { #1 } }
+\cs_new:Nn \xl_math_operator_style:n { \mathsf { #1 } }
+
+%% Currently this only works for unicode-math
+\bool_if:NT \l__xl_math_operator_in_mathsf_bool
+  {
+    % \cs_if_exist_use:N \setoperatorfont \xl_math_operator_style:n
+    \cs_if_exist_use:N \setoperatorfont \mathsf
+  }
+
+%%==================================================
+%%  Common
+%%==================================================
+\DeclarePairedDelimiter \abs   { \lvert } { \rvert }
+\DeclarePairedDelimiter \norm  { \lVert } { \rVert }
+\DeclarePairedDelimiter \tnorm { \lVvert } { \rVvert }
+
+% \newcommand*\conj[1]{\overline{#1}}
+\NewDocumentCommand \conj { m } { \overline { #1 } }
+
+% https://tex.stackexchange.com/a/118217
+\DeclarePairedDelimiter \ceil  { \lceil  } { \rceil  }
+\DeclarePairedDelimiter \floor { \lfloor } { \rfloor }
+
+% \DeclarePairedDelimiterX \set [2] \lbrace \rbrace
+%   {
+%     \mskip1.5mu
+%     #1
+%     \tl_if_blank:nF { #2 } { \mskip2.5mu \mathbf{\delimsize\vert} \mskip2.5mu #2 }
+%     \mskip1.5mu
+%   }
+% \NewDocumentCommand \setsymbol { O{} }
+%   {
+%     \vbox_set:Nn \l_tmpa_box {$#1\vert$}
+%     \mathrel{
+%       \tikz[baseline=\dim_eval:n {\box_dp:N \l_tmpa_box}]
+%         \draw[line~width=.12em] (0,0) -- (0,\dim_eval:n {\box_ht_plus_dp:N \l_tmpa_box});
+%     }
+%     \allowbreak
+%     \mathopen{}
+%   }
+\NewDocumentCommand \setseparator { O{} }
+  {
+    \mspace { 4mu }
+    #1\vert
+    \mspace { 4mu }
+    \allowbreak
+    \mathopen { }
+  }
+\providecommand \given {}
+\DeclarePairedDelimiterX \set [1] \lbrace \rbrace
+  {
+    \tl_set:Nn \given { \setseparator[\delimsize] }
+    \mspace { 1.5mu }
+    #1
+    \mspace { 1.5mu }
+  }
+
+% French style
+% \NewDocumentCommand \restrict { m m }
+%   {
+%     #1 {} \sb { |\mskip1mu #2 }
+%   }
+%
+% https://tex.stackexchange.com/a/22255
+% \newcommand\restr[2]{{% we make the whole thing an ordinary symbol
+%   \left.\kern-\nulldelimiterspace % automatically resize the bar with \right
+%   #1 % the function
+%   \vphantom{\big|} % pretend it's a little taller at normal size
+%   \right|_{#2} % this is the delimiter
+%   }}
+%
+% \NewDocumentCommand \restrict { m m }
+%   {
+%     \group_begin:
+%       \smash
+%         {
+%           \left.
+%             \kern-\nulldelimiterspace
+%             #1
+%             \mathchoice
+%               { \vphantom { \big| } }  % \displaystyle
+%               { \vphantom { \big| } }  % \textstyle
+%               { }                      % \scriptstyle
+%               { }                      % \scriptscriptstyle
+%           \right|
+%         }
+%       \sb { #2 }
+%     \group_end:
+%   }
+%
+\NewDocumentCommand \restrict { s m m }
+  {
+    \group_begin:
+      \smash
+        {
+          \left.
+            \kern-\nulldelimiterspace
+            #2
+            \mathchoice
+              { \vphantom { \big| } }  % \displaystyle
+              { \vphantom { \big| } }  % \textstyle
+              { }                      % \scriptstyle
+              { }                      % \scriptscriptstyle
+          \right|
+        }
+      \IfBooleanT { #1 } { \mathclose { \vphantom { #2 } } }
+      \sb { #3 }
+    \group_end:
+  }
+
+\NewDocumentCommand \singleton {}
+  {
+    \mspace { 1.5mu }
+    \mathord { * }
+    \mspace { 1.5mu }
+  }
+
+\NewDocumentCommand \genericvariable {}
+  {
+    \mspace { 3mu }
+    \vcenter{\hbox{\rule{.225em}{.225em}}}
+    \mspace { 3mu }
+  }
+\NewDocumentCommand \genericobject {}
+  {
+    \mspace { 1.5mu }
+    \mathord{\square}
+    \mspace { 1.5mu }
+  }
+
+% https://tex.stackexchange.com/a/217624
+\NewDocumentCommand \transpose { m }
+  {
+    #1 \sp{\@transpose}
+  }
+\newcommand*{\@transpose}{%
+  {\mathpalette\@@transpose{}}%
+}
+\newcommand*{\@@transpose}[2]{%
+  % #1: math style
+  % #2: unused
+  \raisebox{\depth}{$\m@th#1\intercal$}%
+}
+% https://tex.stackexchange.com/a/136464
+\NewDocumentCommand \franspose { O{-3mu} m }
+  {
+    \mskip1mu\prescript{\smash{\mathrm t\mkern#1}}{}{\mathstrut#2}
+  }
+
+%%==================================================
+%%  Constant e and i
+%%==================================================
+\NewDocumentCommand \e { } { \mathrm{e} }
+\RedefineInMathMode \i { \mathrm{i} }
+\RedefineInMathMode \j { \mathrm{j} }
+
+%%==================================================
+%%  Arrows for morphisms
+%%==================================================
+\NewDocumentCommand \injection  { } { \hookrightarrow    }
+\NewDocumentCommand \surjection { } { \twoheadrightarrow }
+\NewDocumentCommand \bijection  { } { \xrightarrow{\sim} }
+
+%%==================================================
+%%  Complementary to usual operators
+%%==================================================
+\DefineMathOperator { sgn }
+\DefineMathOperator { lcm }         \DefineMathOperator { pgcd, ppcm }
+\DefineMathOperator { ord, card }
+\DefineMathOperator { cl }
+\DefineMathOperator { characteristic = char }
+\DefineMathOperator { grad }
+\DefineMathOperator*{ colim }
+\DefineMathOperator { diag }
+\DefineMathOperator { tr }
+\DefineMathOperator { rank }        \DefineMathOperator { rang }
+\DefineMathOperator { vecspan = span }
+\DefineMathOperator { codim }
+\DefineMathOperator { car, disc, res }
+\DefineMathOperator { supp }
+\DefineMathOperator { proj }
+
+%%==================================================
+%%  Operators - Algebra and number theory
+%%==================================================
+\DefineMathOperator { Ker, Image = Im, Coker, Coim } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { image = im, coker, coim }
+
+\DefineMathOperator { Hom, Aut, End, Isom, Mat, Gal } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Symm = Sym } [ style = \xl_math_operator_style:n ] % !!
+\NewDocumentCommand \HomUL { } { \mathop { \underline { \Hom } } }
+\NewDocumentCommand \EndUL { } { \mathop { \underline { \End } } }
+\NewDocumentCommand \IsomUL { } { \mathop { \underline { \Isom } } }
+
+\DefineMathOperator { Diag } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Span, Vect } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Supp } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Int } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Fit } [ style = \xl_math_operator_style:n ]
+
+\DefineMathOperator { Bil, Mult } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Ob, Obj, Mor, Morph } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { source = s, target = t } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Tor, tor, Ext, ext } [ style = \xl_math_operator_style:n ]
+
+\DefineMathOperator { Sp, Spec, Spm = SpMax, SpMax, SpecMax, Sph = SpHom, SpHom, SpmHom } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { SpEt = Sp } [ style = \mathfrak ]
+\DefineMathOperator { Ann } [ style = \xl_math_operator_style:n ]
+\let\Proj\relax % in case babel russian is loaded
+\DefineMathOperator { Proj } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Frac, Princ, Cl } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Tr, Norm = N } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { D, Disc, Res } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Pic } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Ind } [ style = \xl_math_operator_style:n ]
+
+\DefineMathOperator { Vanish = V, Ideal = I, ZeroSet = Z } [ style = \xl_math_operator_style:n ]
+
+\DefineMathOperator { Stab, Fix, Orb, Per } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { GL, SL, SU, SO } [ style = \xl_math_operator_style:n ]
+
+\DefineMathOperator { gl, su, so } [ style = \mathfrak ]
+\RedefineInMathMode \sl { \mathfrak{sl} }
+
+\DefineMathOperator { Der, Jac } [ style = \xl_math_operator_style:n ]
+
+\DefineMathOperator { gr } [ style = \xl_math_operator_style:n ]
+
+% \NewDocumentCommand \dimkrull { } { \dim\sb{\mathrm{Krull}} }
+\NewDocumentCommand \dimkrull { } { \dim\sb{\text{\tiny$\mathrm{Krull}$}} }
+
+%%==================================================
+%%  Symbols - Common
+%%==================================================
+\DefineMathSymbol { id, Id, 1 } [ style = \xl_math_operator_style:n ]
+
+\DefineMathSymbol { ev } [ style = \xl_math_operator_style:n ]
+\DefineMathSymbol { pr } [ style = \xl_math_operator_style:n ]
+\DefineMathSymbol { I } [ style = \xl_math_operator_style:n ]
+
+% \DefineMathSymbol { Rel = R } [ style = \mathscr ]
+\NewDocumentCommand \Rel {} { \mathbin { \mathscr { R } } }
+
+\RedefineInMathMode \L { \mathcal{L} }
+\DefineMathSymbol { Lin = L } [ style = \mathcal ]
+\DefineMathSymbol { Sym = S, Alt = A } [ style = \mathfrak ]
+\DefineMathSymbol { FT = F } [ style = \mathcal ]
+\DefineMathSymbol { Frob = F } [ style = \mathscr ]
+\DefineMathSymbol { Scindage = S } [ style = \mathscr ]
+
+%%==================================================
+%%  Symbols - Sets
+%%==================================================
+\RedefineInMathMode \P { \mathbb{P} }
+\RedefineInMathMode \S { \mathbb{S} }
+
+\DefineMathSymbol { N, Z, Q, R, C, K, F, A, TT = T, G } [ style = \mathbb ]
+
+\RedefineInMathMode \O { \mathcal{O} }
+\DefineMathSymbol { M } [ style = \mathcal ]
+
+\bool_if:NTF \l__xl_math_quaternion_bool
+  {
+    \RedefineInMathMode \k { \mathrm{k} }
+    \NewDocumentCommand \kk { } { \Bbbk }
+    \RedefineInMathMode \H { \mathbb{H} }
+    \DefineMathSymbol { HH = H } [ style = \mathsf ] % For (co)homologies
+  }
+  {
+    \RedefineInMathMode \k { \Bbbk }
+    \RedefineInMathMode \H { \mathsf{H} } % For (co)homologies
+  }
+
+%%==================================================
+%%  Symbols - Categories
+%%==================================================
+\ProvideDocumentCommand \category { m }
+  {
+    \mathcal { #1 }
+  }
+\DefineMathSymbol { CC = C, DD = D, EE = E, FF = F, II = I, JJ = J } [ style = \category ]
+
+\NewDocumentCommand \CategoryFont { m }
+  {
+    \tl_set:Nn \l_tmpa_tl {#1}
+    \tl_replace_all:Nnn \l_tmpa_tl { ~ } { }
+    \text{\normalfont\textbf{\textsf{\l_tmpa_tl}}}
+  }
+\DefineMathSymbol [ style = \CategoryFont ]
+  {
+    Set, Mono, Gp, Grp, Ab, Ring, Field, Grad,
+    cVect = Vect, Mod, Alg, Nul,
+    Cone,
+    Top, Comp, TopPt, RTop, Ouv,
+    Sheaf, Presheaf,
+    RS, RingedSpace, LRS, LocallyRingedSpace,
+    Var, Sch, Aff,
+    QCoh, Coh
+  }
+\NewDocumentCommand \lMod { } { \nobreak\text{\normalfont-}\nobreak \Mod }
+\NewDocumentCommand \rMod { } { \Mod \nobreak\text{\normalfont-}\nobreak }
+\NewDocumentCommand \lAlg { } { \nobreak\text{\normalfont-}\nobreak \Alg }
+\NewDocumentCommand \rAlg { } { \Alg \nobreak\text{\normalfont-}\nobreak }
+\NewDocumentCommand \lEns { } { \nobreak\text{\normalfont-}\nobreak \Ens }
+\NewDocumentCommand \lVect { } { \nobreak\text{\normalfont-}\nobreak \cVect }
+\NewDocumentCommand \lVar { } { \nobreak\text{\normalfont-}\nobreak \Var }
+\NewDocumentCommand \lSch { } { \nobreak\text{\normalfont-}\nobreak \Sch }
+\NewDocumentCommand \lAff { } { \nobreak\text{\normalfont-}\nobreak \Aff }
+
+% French version
+\DefineMathSymbol [ style = \CategoryFont ]
+  {
+    Ens, Anneaux = Ann, Prefaisceaux = Pref, Faisceaux = Faisc, EspAnn, EspLocAnn
+  }
+
+\RedefineInMathMode \o { \mathrm{o} }
+\DefineMathSymbol { op, opp }
+
+\bool_if:NTF \l__xl_math_fancy_functor_bool
+  {
+    \cs_if_exist:NTF \mathsfit
+      {
+        \NewDocumentCommand \functor { m } { \mathsfit { #1 } }
+      }
+      {
+        \NewDocumentCommand \functor { m } { #1 }
+      }
+  }
+  {
+    \NewDocumentCommand \functor { m } { #1 }
+  }
+
+%%==================================================
+%%  Misc
+%%==================================================
+\NewDocumentCommand \ideal { m } { \xl_math_ideal_aux:w #1 }
+\NewDocumentCommand \xl_math_ideal_aux:w { m e{_^} }{ \xl_math_decompose_apply:Nnnn \mathfrak { #1 } { #2 } { #3 } }
+
+\let\sheafstyle\mathscr
+\NewDocumentCommand \sheaf { m } { \xl_math_sheaf_aux:w #1 }
+\NewDocumentCommand \xl_math_sheaf_aux:w { m e{_^} }{ \xl_math_decompose_apply:Nnnn \sheafstyle { #1 } { #2 } { #3 } }
+
+% \NewDocumentCommand \ideal { m } { \mathfrak { #1 } }
+% \NewDocumentCommand \sheaf { m } { \mathscr { #1 } }
+
+\NewDocumentCommand \rationalmap { O{} }
+  {
+    \mathrel{\tikz [line~width = .6pt, >={Stealth[round,length=3.4pt,width=6.15pt,inset=2.25pt]}, ->, dash~pattern=on 2pt off 2pt,#1] \draw [#1] (0pt,0.5ex) -- (1em,0.5ex);}
+  }
+\NewDocumentCommand \pointo { O{} }
+  {
+    \mathrel{\tikz [line~width = .6pt, >={Stealth[round,length=3.4pt,width=6.15pt,inset=2.25pt]}, ->, dash~pattern=on .8pt off 1.2pt,#1] \draw [#1] (0pt,0.5ex) -- (1em,0.5ex);}
+  }
+
+% \newcommand{\bigast}{\mathop{\scalebox{1.5}{\raisebox{-0.2ex}{$\ast$}}}}
+\NewDocumentCommand \bigast { }
+  {
+    \mathop
+      {
+        \mathchoice
+          { \scalebox{3}{\raisebox{-0.4ex}{$\ast$}} }    % \displaystyle
+          { \scalebox{2}{\raisebox{-0.27ex}{$\ast$}} }   % \textstyle
+          { \scalebox{1.5}{\raisebox{-0.2ex}{$\ast$}} }  % \scriptstyle
+          { \scalebox{1.2}{\raisebox{-0.15ex}{$\ast$}} } % \scriptscriptstyle
+      }
+  }
+
+\newcommand{\svdots}{%
+  \vbox {\baselineskip 3\p@ \kern 3\p@ \hbox{.}\hbox{.}\hbox{.}}
+}
+% https://tex.stackexchange.com/a/594688
+\newcommand{\ssvdots}{%
+  \vbox{\fontsize{\sf@size}{\sf@size pt}\linespread{0.3}\selectfont
+    \kern0.2\baselineskip
+    \hbox{.}\hbox{.}\hbox{.}%
+    \kern0.1\baselineskip
+  }%
+}
+
+% https://tex.stackexchange.com/a/39222
+\NewCommandCopy\@@pmod\pmod
+\DeclareRobustCommand{\pmod}{\@ifstar\@pmods\@@pmod}
+\def\@pmods#1{\mkern4mu({\operator@font mod}\mkern 6mu#1)}
+
+% https://tex.stackexchange.com/a/433881
+\newcommand{\genlegendre}[4]{%
+  \genfrac{(}{)}{}{#1}{#3}{#4}%
+  \if\relax\detokenize{#2}\relax\else\sb{\!#2}\fi
+}
+\newcommand{\legendre}[3][]{\genlegendre{}{#1}{\,#2\,}{\,#3\,}}
+\newcommand{\dlegendre}[3][]{\genlegendre{0}{#1}{\,#2\,}{\,#3\,}}
+\newcommand{\tlegendre}[3][]{\genlegendre{1}{#1}{\,#2\,}{\,#3\,}}
+%</XL-math>
+%
+%<*XL-text>
+\keys_define:nn { XL-text }
+  {
+    , unknown .code:n = {}
+  }
+\ProcessKeyOptions [ XL-text ]
+
+\RequirePackage { projlib-text }
+\RequirePackage { needspace }
+\RequirePackage { tabto }
+
+% \NewCommandCopy \Liscription \ItemDescription
+\ProvideDocumentCommand \Liscription { d() }
+  {
+    \textcolor { main-text!50!paper } { $($ #1 $)$  }
+    \nobreakspace
+    \ignorespaces
+  }
+
+\RequirePackage { aliascnt }
+\cs_if_exist:cT { c@chapter }
+  {
+    \newaliascnt { mainstream   } { chapter }
+    \NewCommandCopy \mainstream    \chapter
+  }
+\newaliascnt { stream       } { section }
+\newaliascnt { substream    } { subsection }
+\newaliascnt { subsubstream } { subsubsection }
+\NewCommandCopy \stream        \section
+\NewCommandCopy \substream     \subsection
+\NewCommandCopy \subsubstream  \subsubsection
+
+\cs_if_exist:cT { sectionsub }
+  {
+    \newaliascnt { streamsub } { sectionsub }
+    \NewCommandCopy \streamsub  \sectionsub
+  }
+\cs_if_exist:cT { subsectionsub }
+  {
+    \newaliascnt { substreamsub } { subsectionsub }
+    \NewCommandCopy \substreamsub  \subsectionsub
+  }
+
+
+\RequirePackage { enumitem }
+
+\newlist{enumerate-alph}{enumerate}{10}
+\setlist[enumerate-alph]{leftmargin = \maxof{\parindent}{1.5em},
+    label = \normalfont\emph{\alph*}$\mskip-.5mu\big)$,
+    ref   = \normalfont\color{.!45!paper}\emph{\alph*}$\mskip-.5mu\big)$}
+\newlist{enumerate-Alph}{enumerate}{10}
+\setlist[enumerate-Alph]{leftmargin = \maxof{\parindent}{1.5em},
+    labelsep = .3em, % Alph numerals are wider so one has to reduce the \labelsep
+    label = \normalfont\parbox[t]{1em}{\centering\Alph*}$\mskip-3mu\big)$,
+    ref   = \normalfont\color{.!45!paper}\settowidth{\dimen0}{\Alph*}\hspace*{\dimexpr.15ex+(\dimen0-1em)/2\relax}\parbox[t]{1em}{\centering\Alph*}$\mskip-3mu\big)$}
+\newlist{enumerate-arabic}{enumerate}{10}
+\setlist[enumerate-arabic]{leftmargin = \maxof{\parindent}{1.5em},
+    label = \normalfont\arabic*$\mskip-.5mu\big)$,
+    ref   = \normalfont\color{.!45!paper}\arabic*$\mskip-.5mu\big)$}
+\newlist{enumerate-roman}{enumerate}{10}
+\setlist[enumerate-roman]{leftmargin = \maxof{\parindent}{1.5em},
+    labelsep = .3em, % roman numerals are wider so one has to reduce the \labelsep
+    label = \normalfont\emph{\roman*}$\mskip-.5mu\big)$,
+    ref   = \normalfont\color{.!45!paper}\emph{\roman*}$\mskip-.5mu\big)$}
+\newlist{enumerate-Roman}{enumerate}{10}
+\setlist[enumerate-Roman]{leftmargin = \maxof{\parindent}{3em},
+    label = \normalfont\Roman*$\mskip-.5mu\big)$,
+    ref   = \normalfont\color{.!45!paper}\Roman*$\mskip-.5mu\big)$}
+
+\newlist{subenumerate}{enumerate}{1}
+\setlist[subenumerate]{
+    label = \normalfont\arabic{enumi}\emph{\alph*}$\mskip-.5mu\big)$,
+    ref   = \normalfont\color{.!45!paper}\arabic{enumi}\emph{\alph*}$\mskip-.5mu\big)$}
+
+
+\ProvideDocumentCommand \manualitem { m }
+  {
+    \item [ {#1} ]
+    \tl_set:Nn \@currentlabel { #1 }
+  }
+
+% ibid.
+\ProvideDocumentCommand { \ibid } { }
+  {
+    \projlib_text_abbreviation_generic:nn { \textit{ibid.} } { }
+  }
+
+% et seq.
+\ProvideDocumentCommand { \etseq } { }
+  {
+    \projlib_text_abbreviation_generic:nn { \textit{et \nobreakspace seq.} } { }
+  }
+
+% loc. cit.
+\ProvideDocumentCommand { \loccit } { }
+  {
+    \projlib_text_abbreviation_generic:nn { \textit{loc. \nobreak \hskip.4ex \nobreak cit.} } { }
+  }
+%</XL-text>
+%
+%<*XL-management>
+\keys_define:nn { XL-management }
+  {
+    , sub-file .bool_set:N = \g__xl_management_subfile_bool
+    , sub-file .initial:n  = { false }
+    , sub~file .bool_set:N = \g__xl_management_subfile_bool
+    , sub file .bool_set:N = \g__xl_management_subfile_bool
+    , unknown  .code:n = {}
+  }
+\ProcessKeyOptions [ XL-management ]
+
+\RequirePackage { docmute }
+
+
+\ior_new:N \l__xl_management_file_ior
+
+% When subfile mode is not on, detect if it is actually a subfile
+\bool_if:NF \g__xl_management_subfile_bool
+  {
+    \file_if_exist:nT { ../list.txt }
+      {
+        \ior_open:Nn \l__xl_management_file_ior { ../list.txt }
+        \ior_map_inline:Nn \l__xl_management_file_ior
+          {
+            \exp_args:No \str_if_eq:nnT { \jobname } { #1 }
+              {
+                \bool_gset_true:N \g__xl_management_subfile_bool
+              }
+          }
+        \ior_close:N \l__xl_management_file_ior
+      }
+  }
+
+% Load common settings for main and sub-files
+\bool_if:NTF \g__xl_management_subfile_bool
+  {
+    \ExplSyntaxOff
+    \InputIfFileExists{../common-settings.tex}{}{}
+    \ExplSyntaxOn
+  }
+  {
+    \ExplSyntaxOff
+    \InputIfFileExists{common-settings.tex}{}{}
+    \ExplSyntaxOn
+  }
+
+% Allow referencing across files
+\bool_if:NT \g__xl_management_subfile_bool
+  {
+    \RequirePackage { xr }
+    \ior_open:Nn \l__xl_management_file_ior { ../list.txt }
+    \ior_map_inline:Nn \l__xl_management_file_ior
+      {
+        \exp_args:No \str_if_eq:nnF { \jobname } { #1 }
+          {
+            \ExplSyntaxOff
+            \externaldocument{../#1/#1}
+            \ExplSyntaxOn
+          }
+      }
+    \ior_close:N \l__xl_management_file_ior
+  }
+
+\NewDocumentCommand \Input { m }
+  {
+    \input { #1/#1.tex }
+  }
+
+\NewDocumentCommand \Include { m }
+  {
+    \include { #1/#1.tex }
+  }
+
+% Add index to subfiles
+\bool_if:NT \g__xl_management_subfile_bool
+  {
+    \hook_gput_code:nnn { enddocument } { XL-management } { \printindex }
+  }
+
+
+% Short and detailed ToC
+\RequirePackage { projlib-language }
+\RequirePackage { titletoc }
+\hook_gput_code:nnn { begindocument } { XL-management }
+  {
+    \startcontents[XL-short]
+    \startcontents[XL-detailed]
+  }
+
+\def\shortcontentsname{\contentsname}
+% \def\@startshorttoc#1{\bgroup
+%   \makeatletter
+%   \@input{\jobname.#1}%
+%   \global\@nobreakfalse \egroup}
+% \NewDocumentCommand \shorttableofcontents { O{1} }
+%   {
+%     \bgroup
+%     \setcounter{tocdepth}{#1}
+%     \@restonecolfalse
+%     \if@twocolumn\@restonecoltrue\onecolumn\fi
+%     \@ifundefined{chapter}%
+%     {\section*{{\shortcontentsname}
+%         \@mkboth{\uppercase{\shortcontentsname}}{\uppercase{\shortcontentsname}}}}%
+%     {\chapter*{{\shortcontentsname}
+%         \@mkboth{\uppercase{\shortcontentsname}}{\uppercase{\shortcontentsname}}}}%
+%     \pdfbookmark[1]{\contentsname}{toc}%
+%     \@startshorttoc{toc}\if@restonecol\twocolumn\fi
+%     \egroup
+%   }
+\NewDocumentCommand \shorttableofcontents { O{1} }
+  {
+    \@ifundefined{c@chapter}{}{\cleardoublepage}
+    \phantomsection
+    \pdfbookmark[1]{\shortcontentsname}{toc}%
+    \@ifundefined{c@chapter}%
+      {\section*{{\shortcontentsname}
+          \@mkboth{\uppercase{\shortcontentsname}}{\uppercase{\shortcontentsname}}}}%
+      {\chapter*{{\shortcontentsname}
+          \@mkboth{\uppercase{\shortcontentsname}}{\uppercase{\shortcontentsname}}}}%
+    \bgroup
+    \parskip=0pt
+    \printcontents[XL-short]{}{-1}[#1]{}
+    \egroup
+    \@ifundefined{c@chapter}{}{\cleardoublepage}
+  }
+
+\projlib_langauge_define_multilingual_text:Nn \detailedcontentsname
+  {
+    , EN = Detailed~table~of~contents
+    , FR = Table~des~matières~détaillée
+    , DE = Detailliertes~Inhaltsverzeichnis
+    , IT = Indice~dettagliato
+    , PT = Conteúdo~detalhado
+    , BR = Sumário~detalhado
+    , ES = Índice~detallado
+    , CN = 目录（详细）
+    , TC = 目錄（詳細）
+    , JP = 目次（詳細）
+    , RU = Оглавление~(подробно)
+  }
+% \NewDocumentCommand \detailedtableofcontents { O{3} }
+%   {
+%     \setcounter{tocdepth}{#1}
+%     \bgroup
+%     \let\contentsname\detailedcontentsname
+%     \tableofcontents
+%     \egroup
+%   }
+\NewDocumentCommand \detailedtableofcontents { O{3} }
+  {
+    \bookmarksetup{startatroot}
+    \stopcontents[XL-detailed]
+    \@ifundefined{c@chapter}{}{\cleardoublepage}
+    \phantomsection
+    \@ifundefined{c@chapter}%
+      {\addcontentsline{toc}{section}{\detailedcontentsname}%
+        \section*{{\detailedcontentsname}
+          \@mkboth{\uppercase{\detailedcontentsname}}{\uppercase{\detailedcontentsname}}}}%
+      {\addcontentsline{toc}{chapter}{\detailedcontentsname}%
+        \chapter*{{\detailedcontentsname}
+          \@mkboth{\uppercase{\detailedcontentsname}}{\uppercase{\detailedcontentsname}}}}%
+    \bgroup
+    \parskip=0pt
+    \printcontents[XL-detailed]{}{-1}[#1]{}
+    \egroup
+    \@ifundefined{c@chapter}{}{\cleardoublepage}
+    \resumecontents[XL-detailed]
+  }
+
+
+% An unified command for adjustments
+\msg_new:nnn { xl-management }
+  { unknown-adjustment-type }
+  { Unknown~adjustment~type~"\l_keys_key_str". }
+
+\keys_define:nn { xl-management-adjust }
+  {
+    , hspace           .code:n       = { \hspace { #1 } }
+    , hspace*          .code:n       = { \hspace*{ #1 } }
+    , vspace           .code:n       = { \vspace { #1 } }
+    , vspace*          .code:n       = { \vspace*{ #1 } }
+    , smallskip        .code:n       = { \smallskip }
+    , medskip          .code:n       = { \medskip   }
+    , bigskip          .code:n       = { \bigskip   }
+
+    , above            .code:n       = { \setlength { \abovedisplayskip } { #1 } } % \setlength { \abovedisplayshortskip } { #1 }
+    , below            .code:n       = { \setlength { \belowdisplayskip } { #1 } } % \setlength { \belowdisplayshortskip } { #1 }
+    , above and below  .code:n       = { \setlength { \abovedisplayskip } { #1 }
+                                         \setlength { \belowdisplayskip } { #1 } }
+    , above-and-below  .meta:n       = { above and below = #1 }
+    , above~and~below  .meta:n       = { above and below = #1 }
+
+    , enlargethispage  .code:n       = { \enlargethispage { #1 } }
+    , enlargethispage* .code:n       = { \enlargethispage*{ #1 } }
+    , enlarge          .meta:n       = { enlargethispage = #1 }
+    , enlarge*         .meta:n       = { enlargethispage*= #1 }
+
+    , clearpage        .code:n       = { \clearpage }
+    , clear            .meta:n       = { clearpage }
+    , pagebreak        .code:n       = { \pagebreak }
+    , break            .meta:n       = { pagebreak }
+
+    , par              .code:n       = { \par }
+    , linebreak        .code:n       = { \linebreak }
+
+    , code             .code:n       = { #1 }
+
+    , unknown          .code:n       = { \msg_warning:nnn { xl-management } { unknown-adjustment-type } { #1 } }
+  }
+
+\NewDocumentCommand \adjust { O{} +m }
+  {
+    \keys_set:nn { xl-management-adjust } { #2 }
+  }
+%</XL-management>
+
+\endinput
