@@ -151,7 +151,9 @@
 \RequirePackage { projlib-math }
 
 \RequirePackage { tikz-cd }
-\usetikzlibrary { calc }
+\ExplSyntaxOff
+\usetikzlibrary{calc}
+\ExplSyntaxOn
 \RequirePackage { derivative }
 \RequirePackage { xfrac }
 
@@ -679,6 +681,12 @@
     , sub-file .initial:n  = { false }
     , sub~file .bool_set:N = \g__xl_management_subfile_bool
     , sub file .bool_set:N = \g__xl_management_subfile_bool
+
+    , adjust    .clist_set:N = \g__xl_management_adjustment_mode_clist
+    , adjust-to .clist_set:N = \g__xl_management_adjustment_mode_clist
+    , adjust~to .clist_set:N = \g__xl_management_adjustment_mode_clist
+    , adjust to .clist_set:N = \g__xl_management_adjustment_mode_clist
+
     , unknown  .code:n = {}
   }
 \ProcessKeyOptions [ XL-management ]
@@ -882,9 +890,22 @@
     , unknown          .code:n       = { \msg_warning:nnn { xl-management } { unknown-adjustment-type } { #1 } }
   }
 
+\clist_if_exist:NF \g__xl_management_adjustment_mode_clist
+  {
+    \clist_new:N \g__xl_management_adjustment_mode_clist
+  }
 \NewDocumentCommand \adjust { O{} +m }
   {
-    \keys_set:nn { xl-management-adjust } { #2 }
+    \tl_if_blank:nTF { #1 }
+      {
+        \keys_set:nn { xl-management-adjust } { #2 }
+      }
+      {
+        \clist_if_in:NnT \g__xl_management_adjustment_mode_clist { #1 }
+          {
+            \keys_set:nn { xl-management-adjust } { #2 }
+          }
+      }
   }
 %</XL-management>
 
