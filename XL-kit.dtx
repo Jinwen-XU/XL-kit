@@ -44,6 +44,13 @@
   {XL's text configuration}
 %</XL-text>
 %
+%<*XL-title>
+\ProvidesExplPackage
+  {XL-title}
+  {2023/10/15} {}
+  {XL's title configuration}
+%</XL-title>
+%
 %<*XL-management>
 \ProvidesExplPackage
   {XL-management}
@@ -54,11 +61,15 @@
 %<*XL-kit>
 \keys_define:nn { XL-kit }
   {
+    , title   .bool_set:N = \l__xl_kit__title_enabled_bool
+    , title   .initial:n  = { false }
+
     , unknown .code:n = {
                           \PassOptionsToPackage { \CurrentOption } { ProjLib }
                           \PassOptionsToPackage { \CurrentOption } { XL-logo }
                           \PassOptionsToPackage { \CurrentOption } { XL-math }
                           \PassOptionsToPackage { \CurrentOption } { XL-text }
+                          \PassOptionsToPackage { \CurrentOption } { XL-title }
                           \PassOptionsToPackage { \CurrentOption } { XL-management }
                         }
   }
@@ -69,6 +80,11 @@
 \RequirePackage { XL-math }
 \RequirePackage { XL-text }
 \RequirePackage { XL-management }
+
+\bool_if:NT \l__xl_kit__title_enabled_bool
+  {
+    \RequirePackage { XL-title }
+  }
 
 \hook_gput_code:nnn { begindocument/before } { XL-kit }
   {
@@ -676,6 +692,109 @@
     \projlib_text_abbreviation_generic:nn { \textit{loc. \nobreak \hskip.4ex \nobreak cit.} } { }
   }
 %</XL-text>
+%
+%<*XL-title>
+\keys_define:nn { XL-title }
+  {
+    , unknown .code:n = {}
+  }
+\ProcessKeyOptions [ XL-title ]
+
+\RequirePackage { XL-logo }
+
+\providecommand{\LocallyStopLineNumbers}{}
+\providecommand{\ResumeLineNumbers}{}
+
+%%==================================================
+%%  Redefine title style
+%%==================================================
+
+\renewcommand{\@maketitle}
+  {
+    \LocallyStopLineNumbers
+
+    \dim_set:Nn \l_tmpa_dim { \parskip }
+
+    \begin{tcolorbox}[
+      enhanced~jigsaw, sharp~corners,
+      sidebyside,
+      % sidebyside~adapt=left,
+      lefthand~width = .33\linewidth,
+      lower~separated = false,
+      toprule = .75pt, bottomrule = .75pt,
+      leftrule = 0pt, rightrule = 0pt,
+      boxsep = 0pt,
+      top = 1.5ex, bottom = 1.5ex,
+      left = 0pt, right = 0pt,
+      colframe = main-text!27!paper,
+      colback = paper,
+    ]
+      \scalebox{
+        \fp_eval:n { \dim_to_fp:n { 3em } / \dim_to_fp:n { 1cm } }
+      }{\XLlogo}
+      \tcblower
+      \begin{flushright}
+        \let\footnote\thanks
+        {\bfseries\sffamily\@title}\\\medskip
+        \color{main-text!80!paper}
+        {\small\@author}
+        \par\vspace{-\parskip}\vspace{2pt}
+        {\small\@date}
+      \end{flushright}
+      \dim_compare:nNnT { \l_tmpa_dim } < { 2pt } { \vspace{-.8\baselineskip} }
+      \vspace{-2pt}
+    \end{tcolorbox}
+    \vspace{\parskip}
+
+    \par
+    \ResumeLineNumbers
+  }
+
+\hook_gput_code:nnn { begindocument/end } { XL-title }
+  {
+    \tl_if_empty:NF \@title
+      {
+        \maketitle
+      }
+  }
+
+%%================================
+%%  Redefine abstract style
+%%================================
+
+\renewenvironment{abstract}
+  {
+    \LocallyStopLineNumbers
+    \begin{flushright}
+      {\bfseries\sffamily\small\abstractname}\par
+      \vspace{-\parskip}
+      \vspace{-.25\baselineskip}
+      \begin{minipage}[t]{.833\textwidth}
+        \vspace{0pt}
+        \color{main-text!80!paper}
+        \footnotesize
+        \parindent=2em
+  }
+  {
+      \end{minipage}
+    \end{flushright}
+    \bigskip
+    \ResumeLineNumbers
+  }
+
+%% The following code is for the compatibility with the document class
+\RequirePackage { projlib-author }
+
+\RenewCommandCopy \projlib_author_backup_abstract: \abstract
+\RenewCommandCopy \projlib_author_backup_endabstract: \endabstract
+\cs_undefine:N \abstract
+\cs_undefine:N \endabstract
+
+\RequirePackage { scontents }
+\cs_undefine:N \__scontents_abstract_env_begin:
+\cs_undefine:N \__scontents_abstract_env_end:
+\newenvsc { abstract } [ store-env = projlib-author-abstract, print-env = false ]
+%</XL-title>
 %
 %<*XL-management>
 \keys_define:nn { XL-management }
