@@ -29,11 +29,11 @@ There are some options available:
 > Each module corresponds to a separate package, for example, the module `management` is `XL-management.sty`.
 
 The modules include:
-1. module `management` --- *automatic management for multi-file projects*
-1. module `logo` --- *the XL logo*
-1. module `math` --- *math configuration*
-1. module `text` --- *text configuration*
-1. module `title` --- *title configuration*
+- module `management` — *automatic management for multi-file projects*
+- module `logo` — *the XL logo*
+- module `math` — *math configuration*
+- module `text` — *text configuration*
+- module `title` — *title configuration*
 
 ### How to get these files
 You can get the above mentioned `.sty` files by compiling `XL-kit.ins`:
