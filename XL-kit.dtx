@@ -358,6 +358,10 @@
 \NewDocumentCommand \injection  { } { \hookrightarrow    }
 \NewDocumentCommand \surjection { } { \twoheadrightarrow }
 \NewDocumentCommand \bijection  { } { \xrightarrow{\sim} }
+\NewCommandCopy \into \injection
+\NewCommandCopy \onto \surjection
+% \NewCommandCopy \mono \injection
+% \NewCommandCopy \epi \surjection
 
 %%==================================================
 %%  Complementary to usual operators
@@ -486,16 +490,19 @@
   }
 \DefineMathSymbol [ style = \CategoryFont ]
   {
-    Set, Mono, Gp, Grp, Ab, Ring, Rng, Field, Grad,
+    Set, Poset,
+    sSet,
+    Mono, Gp, Grp, Ab, Ring, Rng, Field, Grad,
     cVect = Vect, Mod, Alg, Nul,
     Cone,
     Top, Comp, TopPt, RTop, Ouv,
-    Sheaf, Presheaf, PreSheaf,
+    Meas,
+    Sheaf, Presheaf,
     Sh, PSh,
     RS, RingedSpace, LRS, LocallyRingedSpace,
     Var, Sch, Aff,
     QCoh, Coh,
-    Meas,
+    Spectra = Sp, PSp,
   }
 \NewDocumentCommand \lMod { } { \nobreak\text{\normalfont-}\nobreak \Mod }
 \NewDocumentCommand \rMod { } { \Mod \nobreak\text{\normalfont-}\nobreak }
@@ -655,7 +662,7 @@
     label = \normalfont\arabic*$\mskip-.5mu\big)$,
     ref   = \normalfont\color{.!45!paper}\arabic*$\mskip-.5mu\big)$}
 \newlist{enumerate-roman}{enumerate}{10}
-\setlist[enumerate-roman]{leftmargin = \maxof{\parindent}{1.5em},
+\setlist[enumerate-roman]{leftmargin = \maxof{\parindent}{1.75em},
     labelsep = .3em, % roman numerals are wider so one has to reduce the \labelsep
     label = \normalfont\roman*$\mskip-.5mu\big)$,
     ref   = \normalfont\color{.!45!paper}\roman*$\mskip-.5mu\big)$}
@@ -853,7 +860,7 @@
 % Allow referencing across files
 \bool_if:NT \g__xl_management_subfile_bool
   {
-    \RequirePackage { xr }
+    \RequirePackage { xr-hyper }
     \ior_open:Nn \l__xl_management_file_ior { ../list.txt }
     \ior_map_inline:Nn \l__xl_management_file_ior
       {
@@ -1031,6 +1038,50 @@
           }
       }
   }
+
+% Temporary fix for cleveref in order to work with xr-hyper
+% See https://tex.stackexchange.com/a/708445
+\def\cref@getref#1#2{%
+  \expandafter\let\expandafter#2\csname r@#1@cref\endcsname%
+  \expandafter\expandafter\expandafter\def%
+    \expandafter\expandafter\expandafter#2%
+    \expandafter\expandafter\expandafter{%
+      \expandafter\@firstoffive#2}}% <-------- five
+\def\cpageref@getref#1#2{%
+  \expandafter\let\expandafter#2\csname r@#1@cref\endcsname%
+  \expandafter\expandafter\expandafter\def%
+    \expandafter\expandafter\expandafter#2%
+    \expandafter\expandafter\expandafter{%
+      \expandafter\@secondoffive#2}}% <----------- five
+\AtBeginDocument{%
+  \def\label@noarg#1{%
+    \cref@old@label{#1}%
+    \@bsphack%
+    \edef\@tempa{{page}{\the\c@page}}%
+    \setcounter{page}{1}%
+    \edef\@tempb{\thepage}%
+    \expandafter\setcounter\@tempa%
+    \cref@constructprefix{page}{\cref@result}%
+    \protected@write\@auxout{}%
+      {\string\newlabel{#1@cref}{{\cref@currentlabel}%
+      {[\@tempb][\arabic{page}][\cref@result]\thepage}{}{}{}}}% <----- five
+    \@esphack}%
+  \def\label@optarg[#1]#2{%
+    \cref@old@label{#2}%
+    \@bsphack%
+    \edef\@tempa{{page}{\the\c@page}}%
+    \setcounter{page}{1}%
+    \edef\@tempb{\thepage}%
+    \expandafter\setcounter\@tempa%
+    \cref@constructprefix{page}{\cref@result}%
+    \protected@edef\cref@currentlabel{%
+      \expandafter\cref@override@label@type%
+        \cref@currentlabel\@nil{#1}}%
+    \protected@write\@auxout{}%
+      {\string\newlabel{#2@cref}{{\cref@currentlabel}%
+      {[\@tempb][\arabic{page}][\cref@result]\thepage}{}{}{}}}% <------- five
+    \@esphack}%
+}
 %</XL-management>
 
 \endinput
