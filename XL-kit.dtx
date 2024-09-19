@@ -166,7 +166,8 @@
 
 \RequirePackage { projlib-math }
 
-\RequirePackage { tikz-cd }
+\RequirePackage { quiver }
+% \RequirePackage { tikz-cd }
 \ExplSyntaxOff
 \usetikzlibrary{calc}
 \ExplSyntaxOn
@@ -373,6 +374,7 @@
 \DefineMathOperator { characteristic = char }
 \DefineMathOperator { grad }
 \DefineMathOperator*{ colim }
+\DefineMathOperator*{ holim, hocolim }
 \DefineMathOperator { diag }
 \DefineMathOperator { tr }
 \DefineMathOperator { rank }        \DefineMathOperator { rang }
@@ -381,6 +383,7 @@
 \DefineMathOperator { car, disc, res }
 \DefineMathOperator { supp }
 \DefineMathOperator { proj }
+\DefineMathOperator { map }
 
 %%==================================================
 %%  Operators - Algebra and number theory
@@ -403,6 +406,8 @@
 \DefineMathOperator { Bil, Mult } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { Ob, Obj, Mor, Morph } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { source = s, target = t } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Map } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Fun, Func } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { Tor, tor, Ext, ext } [ style = \xl_math_operator_style:n ]
 
 \DefineMathOperator { Sp, Spec, Spm = SpMax, SpMax, SpecMax, Sph = SpHom, SpHom, SpmHom } [ style = \xl_math_operator_style:n ]
@@ -491,9 +496,11 @@
 \DefineMathSymbol [ style = \CategoryFont ]
   {
     Set, Poset,
-    sSet,
+    sSet, sAb, sMod,
+    Ch,
     Mono, Gp, Grp, Ab, Ring, Rng, Field, Grad,
     cVect = Vect, Mod, Alg, Nul,
+    coAlg,
     Cone,
     Top, Comp, TopPt, RTop, Ouv,
     Meas,
@@ -503,6 +510,7 @@
     Var, Sch, Aff,
     QCoh, Coh,
     Spectra = Sp, PSp,
+    Pro,
   }
 \NewDocumentCommand \lMod { } { \nobreak\text{\normalfont-}\nobreak \Mod }
 \NewDocumentCommand \rMod { } { \Mod \nobreak\text{\normalfont-}\nobreak }
@@ -705,6 +713,11 @@
 %<*XL-title>
 \keys_define:nn { XL-title }
   {
+    , no logo .bool_set:N = \l__xl_title_no_logo_bool
+    , no logo .initial:n  = { false }
+    , no-logo .bool_set:N = \l__xl_title_no_logo_bool
+    , no~logo .bool_set:N = \l__xl_title_no_logo_bool
+
     , unknown .code:n = {}
   }
 \ProcessKeyOptions [ XL-title ]
@@ -738,9 +751,17 @@
       colframe = main-text!27!paper,
       colback = paper,
     ]
-      \scalebox{
-        \fp_eval:n { \dim_to_fp:n { 3em } / \dim_to_fp:n { 1cm } }
-      }{\XLlogo}
+      \bool_if:NTF \l__xl_title_no_logo_bool
+        {
+          \phantom{\scalebox{
+            \fp_eval:n { \dim_to_fp:n { 3em } / \dim_to_fp:n { 1cm } }
+          }{\XLlogo}}
+        }
+        {
+          \scalebox{
+            \fp_eval:n { \dim_to_fp:n { 3em } / \dim_to_fp:n { 1cm } }
+          }{\XLlogo}
+        }
       \tcblower
       \begin{flushright}
         \let\footnote\thanks
@@ -922,6 +943,7 @@
 %   }
 \NewDocumentCommand \shorttableofcontents { O{1} }
   {
+    \bookmarksetup{startatroot}
     \@ifundefined{c@chapter}{}{\cleardoublepage}
     \phantomsection
     \pdfbookmark[1]{\shortcontentsname}{toc}%
@@ -976,8 +998,8 @@
     \parskip=0pt
     \printcontents[XL-detailed]{}{-1}[#1]{}
     \egroup
-    \@ifundefined{c@chapter}{}{\cleardoublepage}
     \resumecontents[XL-detailed]
+    \@ifundefined{c@chapter}{}{\cleardoublepage}
   }
 
 
