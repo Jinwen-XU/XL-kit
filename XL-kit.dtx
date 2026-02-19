@@ -320,11 +320,19 @@
     \vcenter{\hbox{\rule{.225em}{.225em}}}
     \mspace { 3mu }
   }
+% \NewDocumentCommand \genericobject {}
+%   {
+%     \mspace { 1.5mu }
+%     \mathord{\square}
+%     \mspace { 1.5mu }
+%   }
 \NewDocumentCommand \genericobject {}
   {
-    \mspace { 1.5mu }
-    \mathord{\square}
-    \mspace { 1.5mu }
+    \mspace { 2mu }
+    \mathord{
+      \makebox[1em]{\rlap{\textcolor{.!27!paper}{\rule[-0.15em]{.95em}{.95em}}}{\kern.075em\raisebox{.075em}{\textcolor{paper}{\rule[-0.15em]{.80em}{.80em}}}\kern.075em}}
+    }
+    \mspace { 2mu }
   }
 
 % https://tex.stackexchange.com/a/217624
@@ -341,9 +349,18 @@
   \raisebox{\depth}{$\m@th#1\intercal$}%
 }
 % https://tex.stackexchange.com/a/136464
-\NewDocumentCommand \franspose { O{-3mu} m }
+\NewDocumentCommand \franspose { O{-2mu} m }
   {
     \mskip1mu\prescript{\smash{\mathrm t\mkern#1}}{}{\mathstrut#2}
+  }
+
+\NewDocumentCommand \acton { }
+  {
+    \mathbin{\vcenter{\hbox{\scalebox{0.5}{$\,\blacktriangleright$}}}}
+  }
+\NewDocumentCommand \actby { }
+  {
+    \mathbin{\vcenter{\hbox{\scalebox{0.5}{$\blacktriangleleft\,$}}}}
   }
 
 %%==================================================
@@ -363,20 +380,28 @@
 \NewCommandCopy \onto \surjection
 % \NewCommandCopy \mono \injection
 % \NewCommandCopy \epi \surjection
+\NewCommandCopy \monomorphism \injection
+\NewCommandCopy \epimorphism \surjection
 
 %%==================================================
 %%  Complementary to usual operators
 %%==================================================
+\DefineMathOperator { RealPart = Re, ImaginaryPart = Im }
+
 \DefineMathOperator { sgn }
 \DefineMathOperator { lcm }         \DefineMathOperator { pgcd, ppcm }
 \DefineMathOperator { ord, card }
+\DefineMathOperator { dom, cod }
+\DefineMathOperator { ad }
 \DefineMathOperator { cl }
 \DefineMathOperator { characteristic = char }
+                                    \DefineMathOperator { caracteristique = car }
 \DefineMathOperator { grad }
 \DefineMathOperator*{ colim }
 \DefineMathOperator*{ holim, hocolim }
 \DefineMathOperator { diag }
 \DefineMathOperator { tr }
+\DefineMathOperator { str } % supertrace
 \DefineMathOperator { rank }        \DefineMathOperator { rang }
 \DefineMathOperator { vecspan = span }
 \DefineMathOperator { codim }
@@ -385,17 +410,28 @@
 \DefineMathOperator { proj }
 \DefineMathOperator { map }
 
+% \DefineMathOperator { trdeg = { tr{.}deg } }
+%                                     \DefineMathOperator { degtr = { deg{.}tr{.} } }
+\DefineMathOperator { trdeg }
+                                    \DefineMathOperator { degtr }
+
 %%==================================================
 %%  Operators - Algebra and number theory
 %%==================================================
 \DefineMathOperator { Ker, Image = Im, Coker, Coim } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { image = im, coker, coim }
 
-\DefineMathOperator { Hom, Aut, End, Isom, Mat, Gal } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Hom, Aut, End, Out, Inn, Iso, Isom } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Mat, Gal } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Lie } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { Symm = Sym } [ style = \xl_math_operator_style:n ] % !!
+\DefineMathOperator { Free } [ style = \xl_math_operator_style:n ]
+                                    \DefineMathOperator { Libre } [ style = \xl_math_operator_style:n ]
 \NewDocumentCommand \HomUL { } { \mathop { \underline { \Hom } } }
 \NewDocumentCommand \EndUL { } { \mathop { \underline { \End } } }
 \NewDocumentCommand \IsomUL { } { \mathop { \underline { \Isom } } }
+
+\DefineMathOperator { Zcenter = Z } [ style = \xl_math_operator_style:n ]
 
 \DefineMathOperator { Diag } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { Span, Vect } [ style = \xl_math_operator_style:n ]
@@ -406,32 +442,47 @@
 \DefineMathOperator { Bil, Mult } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { Ob, Obj, Mor, Morph } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { source = s, target = t } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Dom, Cod } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { Map } [ style = \xl_math_operator_style:n ]
-\DefineMathOperator { Fun, Func } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Fun, Func, Funct, Nat } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { Tor, tor, Ext, ext } [ style = \xl_math_operator_style:n ]
 
-\DefineMathOperator { Sp, Spec, Spm = SpMax, SpMax, SpecMax, Sph = SpHom, SpHom, SpmHom } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Sp, Spec, Spm, SpMax, SpecMax, Sph, SpHom, SpmHom } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { SpEt = Sp } [ style = \mathfrak ]
 \DefineMathOperator { Ann } [ style = \xl_math_operator_style:n ]
+\let\Pr\relax
+\DefineMathOperator { Pr } [ style = \xl_math_operator_style:n ]
 \let\Proj\relax % in case babel russian is loaded
 \DefineMathOperator { Proj } [ style = \xl_math_operator_style:n ]
-\DefineMathOperator { Frac, Princ, Cl } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { Tr, Norm = N } [ style = \xl_math_operator_style:n ]
 \DefineMathOperator { D, Disc, Res } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Div } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Fr } [ style = \xl_math_operator_style:n ] % Frobenius
 \DefineMathOperator { Pic } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Alb } [ style = \xl_math_operator_style:n ] % Albanese variety
 \DefineMathOperator { Ind } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Frac, Princ, Cl } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { As, Ass, Assoc } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Univ = U } [ style = \xl_math_operator_style:n ]
 
 \DefineMathOperator { Vanish = V, Ideal = I, ZeroSet = Z } [ style = \xl_math_operator_style:n ]
 
-\DefineMathOperator { Stab, Fix, Orb, Per } [ style = \xl_math_operator_style:n ]
-\DefineMathOperator { GL, SL, SU, SO } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Germ } [ style = \xl_math_operator_style:n ]
 
-\DefineMathOperator { gl, su, so } [ style = \mathfrak ]
+\DefineMathOperator { Stab, Fix, Orb, Per } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { GL, SL, SU, lieSU = SU, lieU = U, SO, lieSO = SO, lieO = O, lieSp = Sp } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { GO, GSO, GSp } [ style = \xl_math_operator_style:n ]
+
+\DefineMathOperator { gl, su, liesu = su, so, lieso = so, liesp = sp } [ style = \mathfrak ]
 \RedefineInMathMode \sl { \mathfrak{sl} }
 
 \DefineMathOperator { Der, Jac } [ style = \xl_math_operator_style:n ]
 
-\DefineMathOperator { gr } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { Zcycle = Z } [ style = \mathit ]
+\DefineMathOperator { Chow = CH } [ style = \xl_math_operator_style:n ]
+
+\DefineMathOperator { gr, graded = gr, Graded = Gr } [ style = \xl_math_operator_style:n ]
+\DefineMathOperator { grp } [ style = \xl_math_operator_style:n ]
 
 % \NewDocumentCommand \dimkrull { } { \dim\sb{\mathrm{Krull}} }
 \NewDocumentCommand \dimkrull { } { \dim\sb{\text{\tiny$\mathrm{Krull}$}} }
@@ -440,6 +491,8 @@
 %%  Symbols - Common
 %%==================================================
 \DefineMathSymbol { id, Id, 1 } [ style = \xl_math_operator_style:n ]
+
+\RedefineInMathMode \d { \xl_math_operator_style:n { d } } % differential operator
 
 \DefineMathSymbol { ev } [ style = \xl_math_operator_style:n ]
 \DefineMathSymbol { pr } [ style = \xl_math_operator_style:n ]
@@ -452,7 +505,7 @@
 \DefineMathSymbol { Lin = L } [ style = \mathcal ]
 \DefineMathSymbol { Sym = S, Alt = A } [ style = \mathfrak ]
 \DefineMathSymbol { FT = F } [ style = \mathcal ]
-\DefineMathSymbol { Frob = F } [ style = \mathscr ]
+\DefineMathSymbol { Frob = F } [ style = \mathscr ] % Frobenius
 \DefineMathSymbol { Scindage = S } [ style = \mathscr ]
 
 %%==================================================
@@ -476,7 +529,13 @@
   {
     \RedefineInMathMode \k { \Bbbk }
     \RedefineInMathMode \H { \mathsf{H} } % For (co)homologies
+    \DefineMathSymbol { HH = H } [ style = \mathbb ]
   }
+\NewDocumentCommand \HypH { } { \mathbfsfup{H} } % Hyper (co)homology
+% https://tex.stackexchange.com/a/759205
+\NewDocumentCommand \CechH { } { \mathsf{\Umathaccent fixed 7\symoperators "002C7 H} } % Čech (co)homology
+
+\DefineMathSymbol { KK = K, KKK = KK } [ style = \mathsf ] % K-theory
 
 %%==================================================
 %%  Symbols - Categories
@@ -485,7 +544,7 @@
   {
     \mathcal { #1 }
   }
-\DefineMathSymbol { CC = C, DD = D, EE = E, FF = F, II = I, JJ = J } [ style = \category ]
+\DefineMathSymbol { CC = C, DD = D, EE = E, FF = F, II = I, JJ = J, MM = M } [ style = \category ]
 
 \NewDocumentCommand \CategoryFont { m }
   {
@@ -495,27 +554,41 @@
   }
 \DefineMathSymbol [ style = \CategoryFont ]
   {
-    Set, Poset,
-    sSet, sAb, sMod,
-    Ch,
-    Mono, Gp, Grp, Ab, Ring, Rng, Field, Grad,
-    cVect = Vect, Mod, Alg, Nul,
+    Cat, sCat,
+    Set, Poset, poSet, POS,
+    sSet, ssSet, sAb, sMod,
+    Ch, Chain,
+    Mono, Monoid, Grp, Group, Grd, Gpd, Grpd, Groupoid, Ab, AbGrp, Ring, Rng, Field,
+    Gr, Grad, GrMod, ModGr, GrVec, VecGr, GrVect, VectGr, GrAlg, AlgGr, GrRing, RingGr,
+    cVec = Vec, cVect = Vect, Mod, Alg, Nul,
+    sVec, sVect,
     coAlg,
+    Rep,
     Cone,
     Top, Comp, TopPt, RTop, Ouv,
     Meas,
     Sheaf, Presheaf,
     Sh, PSh,
     RS, RingedSpace, LRS, LocallyRingedSpace,
-    Var, Sch, Aff,
+    Var, Sch, Aff, AbV, AbVar,
     QCoh, Coh,
     Spectra = Sp, PSp,
     Pro,
+    Op, Operad, Properad, Prop,
+    Mot, NumMot, NMot, HomMot, HMot, DerMot, DMot, ArtMot, AMot, ChowMot, ChMot, MixMot, MMot, TMot, MTMot, MTM, DTMot, DTM,
   }
+\NewDocumentCommand \lGr { } { \nobreak\text{\normalfont-}\nobreak \Gr }
+\NewDocumentCommand \rGr { } { \Gr \nobreak\text{\normalfont-}\nobreak }
 \NewDocumentCommand \lMod { } { \nobreak\text{\normalfont-}\nobreak \Mod }
 \NewDocumentCommand \rMod { } { \Mod \nobreak\text{\normalfont-}\nobreak }
+\NewDocumentCommand \lGrMod { } { \nobreak\text{\normalfont-}\nobreak \GrMod }
+\NewDocumentCommand \rGrMod { } { \GrMod \nobreak\text{\normalfont-}\nobreak }
 \NewDocumentCommand \lAlg { } { \nobreak\text{\normalfont-}\nobreak \Alg }
 \NewDocumentCommand \rAlg { } { \Alg \nobreak\text{\normalfont-}\nobreak }
+\NewDocumentCommand \lGrAlg { } { \nobreak\text{\normalfont-}\nobreak \GrAlg }
+\NewDocumentCommand \rGrAlg { } { \GrAlg \nobreak\text{\normalfont-}\nobreak }
+\NewDocumentCommand \lcoAlg { } { \nobreak\text{\normalfont-}\nobreak \coAlg }
+\NewDocumentCommand \rcoAlg { } { \coAlg \nobreak\text{\normalfont-}\nobreak }
 \NewDocumentCommand \lSet { } { \nobreak\text{\normalfont-}\nobreak \Set }
 \NewDocumentCommand \rSet { } { \Set \nobreak\text{\normalfont-}\nobreak }
 \NewDocumentCommand \lEns { } { \nobreak\text{\normalfont-}\nobreak \Ens }
@@ -524,15 +597,38 @@
 \NewDocumentCommand \lVar { } { \nobreak\text{\normalfont-}\nobreak \Var }
 \NewDocumentCommand \lSch { } { \nobreak\text{\normalfont-}\nobreak \Sch }
 \NewDocumentCommand \lAff { } { \nobreak\text{\normalfont-}\nobreak \Aff }
+\NewDocumentCommand \lMot { } { \nobreak\text{\normalfont-}\nobreak \Mot }
+\NewDocumentCommand \rMot { } { \Mot \nobreak\text{\normalfont-}\nobreak }
 
 % French version
 \DefineMathSymbol [ style = \CategoryFont ]
   {
-    Ens, Anneaux = Ann, Prefaisceaux = Pref, Faisceaux = Faisc, EspAnn, EspLocAnn
+    Ens,
+    Anneaux = Ann,
+    Prefaisceaux = Pref, Faisceaux = Faisc,
+    EspAnn, EspLocAnn,
+    VAb, VarAb,
   }
 
 \RedefineInMathMode \o { \mathrm{o} }
 \DefineMathSymbol { op, opp }
+
+
+% \NewDocumentCommand \dotted { m } { \smash{\overset{\raisebox{-.1em}{$\centerdot$}}{#1}} }
+% \NewDocumentCommand \dotted { m } { \smash{\overset{\raisebox{-.1em}{\scalebox{.5}{$\bullet$}}}{#1}} }
+\newcommand\dotted@[4]{
+  \vbox {%
+    \ialign {%
+      ##\crcr \hfil\scalebox{.5}{$#3\mspace{#1}\bullet$}\hfil\crcr
+      \noalign {\nointerlineskip \vspace{#2} }%
+      $\m@th \hfil #3#4\hfil $\crcr
+    }%
+  }%
+}
+\NewDocumentCommand \dotted { O{0mu} O{.1ex} }{%
+  \mathpalette{\dotted@{#1}{#2}}%
+}
+
 
 \bool_if:NTF \l__xl_math_fancy_functor_bool
   {
@@ -549,10 +645,32 @@
   }
 
 %%==================================================
+%%  Symbols - Operadic structures
+%%==================================================
+\ProvideDocumentCommand \operad { m }
+  {
+    \mathscr { #1 }
+  }
+\NewDocumentCommand \OperadFont { m }
+  {
+    \tl_set:Nn \l_tmpa_tl {#1}
+    \tl_replace_all:Nnn \l_tmpa_tl { ~ } { }
+    \text{\normalfont\textbf{\textit{\textsf{\l_tmpa_tl}}}}
+  }
+\DefineMathSymbol [ style = \OperadFont ]
+  {
+    En = E, Dn = D,
+    Pa,
+    PaB, PaRB,
+    CD, PaCD,
+  }
+
+%%==================================================
 %%  Misc
 %%==================================================
+\let\idealstyle\mathfrak
 \NewDocumentCommand \ideal { m } { \xl_math_ideal_aux:w #1 }
-\NewDocumentCommand \xl_math_ideal_aux:w { m e{_^} }{ \xl_math_decompose_apply:Nnnn \mathfrak { #1 } { #2 } { #3 } }
+\NewDocumentCommand \xl_math_ideal_aux:w { m e{_^} }{ \xl_math_decompose_apply:Nnnn \idealstyle { #1 } { #2 } { #3 } }
 
 \let\sheafstyle\mathscr
 \NewDocumentCommand \sheaf { m } { \xl_math_sheaf_aux:w #1 }
@@ -608,6 +726,21 @@
 \newcommand{\legendre}[3][]{\genlegendre{}{#1}{\,#2\,}{\,#3\,}}
 \newcommand{\dlegendre}[3][]{\genlegendre{0}{#1}{\,#2\,}{\,#3\,}}
 \newcommand{\tlegendre}[3][]{\genlegendre{1}{#1}{\,#2\,}{\,#3\,}}
+
+%%==================================================
+%%  Highlight
+%%==================================================
+\RequirePackage { tcolorbox }
+\tcbuselibrary { many }
+\NewDocumentCommand \XLhighlightmath { m }
+  {
+    \mathchoice
+      {\tcbhighmath[empty,sharp~corners,borderline={.4pt}{0pt}{black!16.67},left=0pt,right=0pt,top=0pt,bottom=0pt,extrude~left~by=3pt,extrude~right~by=3pt,extrude~top~by=3pt,extrude~bottom~by=3pt,boxsep=\fboxsep]{#1}}
+      {\tcbhighmath[empty,sharp~corners,borderline={.4pt}{0pt}{black!16.67},left=0pt,right=0pt,top=0pt,bottom=0pt,extrude~left~by=-2.5pt,extrude~right~by=-2.5pt,extrude~top~by=0pt,extrude~bottom~by=0pt,boxsep=\fboxsep]{#1}}
+      { #1 }
+      { #1 }
+  }
+\ProvideCommandCopy \highlightmath \XLhighlightmath
 %</XL-math>
 %
 %<*XL-text>
@@ -908,9 +1041,15 @@
 % Add index to subfiles
 \bool_if:NT \g__xl_management_subfile_bool
   {
-    \hook_gput_code:nnn { enddocument } { XL-management } { \printindex }
+    % \hook_gput_code:nnn { begindocument/before } { XL-management }
+    %   {
+    %     \hook_gput_code:nnn { enddocument } { XL-management } { \printindex }
+    %   }
+    \hook_gput_next_code:nn { begindocument/before }
+      {
+        \hook_gput_next_code:nn { enddocument } { \printindex }
+      }
   }
-
 
 % Short and detailed ToC
 \RequirePackage { projlib-language }
@@ -999,7 +1138,7 @@
     \printcontents[XL-detailed]{}{-1}[#1]{}
     \egroup
     \resumecontents[XL-detailed]
-    \@ifundefined{c@chapter}{}{\cleardoublepage}
+    % \@ifundefined{c@chapter}{}{\cleardoublepage}
   }
 
 
