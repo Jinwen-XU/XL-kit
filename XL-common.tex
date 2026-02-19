@@ -1,0 +1,177 @@
+\emergencystretch=2em
+\hfuzz=3pt
+\vfuzz=3pt
+
+\ExplSyntaxOn \bool_if:NT \g_projlib_font_already_set_bool { \endinput } \ExplSyntaxOff
+\ExplSyntaxOn \sys_if_engine_luatex:F { \endinput } \ExplSyntaxOff
+
+
+\RequirePackage { fontspec }
+\directlua
+  {
+    fonts.handlers.otf.addfeature
+      {
+        name = "palatino-linotype-fix",
+        type = "kern",
+        data =
+          {
+            ["r"] = { ["ê"] = 120 },
+            ["v"] = { ["ê"] = 180 },
+            ["w"] = { ["ê"] = 180 },
+            ["y"] = { ["ê"] = 180 },
+          },
+      }
+  }
+\setmainfont{Palatino Linotype}
+  [
+    Numbers = OldStyle ,
+    RawFeature = +palatino-linotype-fix
+  ]
+% https://tex.stackexchange.com/a/224585
+\RequirePackage { newunicodechar }
+\newfontfamily{\fallbackfont}{Palatino}%[Scale=MatchUppercase]
+\DeclareTextFontCommand{\textfallback}{\fallbackfont}
+\newunicodechar{ǐ}{\textfallback{ǐ}}
+
+\setmathsf{Palatino Sans LT Pro}
+% \setmathfont{PalatinoSansLTPro-Regular}[range=sfup]
+% \setmathfont{PalatinoSansLTPro-LightIta}[range=sfit]
+% \setmathfont{PalatinoSansLTPro-Bold}[range=bfsfup]
+\let\mathsfit\relax
+\setmathfontface\mathsfit{PalatinoSansLTPro-LightIta}
+\let\mathbfsfup\relax
+\setmathfontface\mathbfsfup{PalatinoSansLTPro-Bold}
+
+% https://tex.stackexchange.com/a/725377
+% % \expandafter\chardef\csname sym__um_fam8\endcsname=100
+% % \advance\count18 -1
+\makeatletter
+% do this after any "classic" allocations such as mathrsfs
+\def\DeclareSymbolFont@m@dropped #1#2#3#4#5{%
+ \@tempswafalse
+ \edef\reserved@b{#2}%
+ \def\cdp@elt##1##2##3##4{\def\reserved@c{##1}%
+      \ifx\reserved@b\reserved@c \@tempswatrue\fi}%
+ \cdp@list
+ \if@tempswa
+   \@ifundefined{sym#1}{%
+      \ifnum\count18< 255 % was 15 %
+        \expandafter\new@mathgroup\csname sym#1\endcsname
+        \expandafter\new@symbolfont\csname sym#1\endcsname
+                        {#2}{#3}{#4}{#5}%
+      \else
+         \@latex@error{Too many symbol fonts declared}\@eha
+      \fi
+     }%
+     {%
+      \@font@info{Redeclaring symbol font `#1'}%
+      \def\group@elt##1##2{%
+           \noexpand\group@elt\noexpand##1%
+           \expandafter\ifx\csname sym#1\endcsname##1%
+             \expandafter\noexpand\csname#2/#3/#4/#5\endcsname
+           \else
+               \noexpand##2%
+           \fi}%
+      \xdef\group@list{\group@list}%
+      \def\version@elt##1{%
+          \expandafter
+          \SetSymbolFont@\expandafter##1\csname#2/#3/#4/#5\expandafter
+              \endcsname \csname sym#1\endcsname
+          }%
+      \version@list
+     }%
+  \else
+    \@latex@error{Encoding scheme  `#2' unknown}\@eha
+  \fi
+  }
+\makeatother
+
+% \setmathfont{KpMath-Regular.otf}[range={}] % reset the metric
+\setmathfont[RawFeature=+nocramped]{KpMath-Regular.otf}[range={}] % reset the metric
+
+
+% https://tex.stackexchange.com/a/664840
+\Umathordbinspacing\scriptstyle=1mu
+\Umathbinordspacing\scriptstyle=1mu
+\Umathordbinspacing\crampedscriptstyle=1mu
+\Umathbinordspacing\crampedscriptstyle=1mu
+
+
+% https://tex.stackexchange.com/a/679184
+\makeatletter
+\pgfset{
+  shorten outer/.code=%
+    \pgfmathsetlength\pgfutil@tempdima{#1}%
+    \pgfkeyssetevalue{/pgf/shorten outer}{\the\pgfutil@tempdima},
+  shorten outer=+0.05pt,
+  unshorten inner/.code=%
+    \pgfmathsetlength\pgfutil@tempdima{#1}%
+    \pgfkeyssetevalue{/pgf/unshorten inner}{\the\pgfutil@tempdima},
+  unshorten inner=+0.05pt}
+\usepackage{etoolbox}
+\patchcmd{\pgf@stroke@inner@line}{\pgfsyssoftpath@invokecurrentpath}{%
+    \ifdim\pgfkeysvalueof{/pgf/unshorten inner}>0pt
+      \let\pgf@tips@mode\pgf@tips@mode@false
+      \pgfsetarrowsstart{}\pgfsetarrowsend{}%
+      \pgfsetshortenstart{-\pgfkeysvalueof{/pgf/unshorten inner}}%
+      \pgfsetshortenend{-\pgfkeysvalueof{/pgf/unshorten inner}}%
+      \pgf@prepare@end@of@path
+      \pgf@prepare@start@of@path
+    \fi\pgfsyssoftpath@invokecurrentpath}{}{\PatchFailed}
+\patchcmd{\pgfusepath}{\fi\pgfsyssoftpath@invokecurrentpath\pgf@up@action}{%
+  \fi \ifdim\pgfinnerlinewidth>0pt
+        \ifdim\pgfkeysvalueof{/pgf/shorten outer}>0pt
+          \pgfgetpath\pgf@temppath
+          \let\pgf@tips@mode\pgf@tips@mode@false
+          \pgfsetarrowsstart{}\pgfsetarrowsend{}%
+          \pgfsetshortenstart{\pgfkeysvalueof{/pgf/shorten outer}}%
+          \pgfsetshortenend{\pgfkeysvalueof{/pgf/shorten outer}}%
+          \pgf@prepare@end@of@path
+          \pgf@prepare@start@of@path\fi\fi
+      \pgfsyssoftpath@invokecurrentpath%
+      \ifdim\pgfinnerlinewidth>0pt
+        \ifdim\pgfkeysvalueof{/pgf/shorten outer}>0pt
+          \pgfsetpath\pgf@temppath\fi\fi\pgf@up@action}{}{\PatchFailed}
+\makeatother
+
+
+% https://tex.stackexchange.com/a/759212
+\makeatletter
+\newbox\example@tex@hyphen@box
+\newbox\example@manual@hyphen@box
+
+\AddToHook{selectfont}[auto-hyphen-box]{%
+    %% Hyphen inserted by TeX
+    \sbox{\example@tex@hyphen@box}{\textcolor{main-text!39!paper}{-}}%
+    %% Hyphen inserted manually
+    \sbox{\example@manual@hyphen@box}{-}%
+}%
+\makeatother
+\RequirePackage { luacode }
+\begin{luacode*}
+    local disc_subtypes = table.swapped(node.subtypes("disc"))
+
+    -- Get the box register numbers
+    local pre_box = luatexbase.registernumber("example@tex@hyphen@box")
+    local replace_box = luatexbase.registernumber("example@manual@hyphen@box")
+
+    -- Replace the inserted hyphen nodes.
+    luatexbase.add_to_callback("hyphenate", function(head, tail)
+        node.hyphenating(head, tail)
+        for n in node.traverse_id(node.id("disc"), head) do
+            if (n.prev or {}).char == utf8.codepoint("-") then
+                -- Probably an em- or en-dash, skip it
+                goto continue
+            end
+
+            if n.subtype == disc_subtypes.automatic then
+                n.pre = node.copy(tex.box[replace_box])
+                n.replace = node.copy(tex.box[replace_box])
+            else
+                n.pre = node.copy(tex.box[pre_box])
+            end
+
+            ::continue::
+        end
+    end, "colour_hyphens")
+\end{luacode*}
