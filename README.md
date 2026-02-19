@@ -1,11 +1,11 @@
-<!-- Copyright (C) 2022-2024 by Jinwen XU -->
+<!-- Copyright (C) 2022-2026 by Jinwen XU -->
 
 <!-- ![image](https://github.com/Jinwen-XU/XL-kit/raw/main/logo/XL-logo.png) -->
 <div align=center><img width="150" height="150" src="https://github.com/Jinwen-XU/XL-kit/raw/main/logo/XL-logo.png"/></div>
 
 # XL-kit
 
-> **This bundle is dated 2024/02/20.**
+> **This bundle is dated 2026/02/20.**
 
 ## Introduction
 
