@@ -5,7 +5,7 @@
 
 # XL-kit
 
-> **This bundle is dated 2026/02/20.**
+> **This bundle is dated 2026/03/09.**
 
 ## Introduction
 
@@ -34,6 +34,8 @@ The modules include:
 - module `math` — *math configuration*
 - module `text` — *text configuration*
 - module `title` — *title configuration*
+- module `report` — *configuration for report type documents*
+- module `bibliography` — *bibliography configuration*
 
 ### How to get these files
 You can get the above mentioned `.sty` files by compiling `XL-kit.ins`:

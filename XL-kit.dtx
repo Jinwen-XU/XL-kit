@@ -19,48 +19,68 @@
 %<*XL-kit>
 \ProvidesExplPackage
   {XL-kit}
-  {2026/02/20} {}
+  {2026/03/09} {}
   {Collective interface of XL's toolkit}
 %</XL-kit>
 %
 %<*XL-logo>
 \ProvidesExplPackage
   {XL-logo}
-  {2026/02/20} {}
+  {2026/03/09} {}
   {The XL logo}
 %</XL-logo>
 %
 %<*XL-math>
 \ProvidesExplPackage
   {XL-math}
-  {2026/02/20} {}
+  {2026/03/09} {}
   {XL's math configuration}
 %</XL-math>
 %
 %<*XL-text>
 \ProvidesExplPackage
   {XL-text}
-  {2026/02/20} {}
+  {2026/03/09} {}
   {XL's text configuration}
 %</XL-text>
 %
 %<*XL-title>
 \ProvidesExplPackage
   {XL-title}
-  {2026/02/20} {}
+  {2026/03/09} {}
   {XL's title configuration}
 %</XL-title>
+%
+%<*XL-report>
+\ProvidesExplPackage
+  {XL-report}
+  {2026/03/09} {}
+  {XL's configuration for report type documents}
+%</XL-report>
+%
+%<*XL-bibliography>
+\ProvidesExplPackage
+  {XL-bibliography}
+  {2026/03/09} {}
+  {XL's bibliography configuration}
+%</XL-bibliography>
 %
 %<*XL-management>
 \ProvidesExplPackage
   {XL-management}
-  {2026/02/20} {}
+  {2026/03/09} {}
   {XL's automatic management for multi-file projects}
 %</XL-management>
 
 %<*XL-kit>
 \keys_define:nn { XL-kit }
   {
+    , bibliography  .bool_set:N = \l__xl_kit__bibliography_enabled_bool
+    , bibliography  .initial:n  = { false }
+
+    , report  .bool_set:N = \l__xl_kit__report_enabled_bool
+    , report  .initial:n  = { false }
+
     , title   .bool_set:N = \l__xl_kit__title_enabled_bool
     , title   .initial:n  = { false }
 
@@ -70,6 +90,8 @@
                           \PassOptionsToPackage { \CurrentOption } { XL-math }
                           \PassOptionsToPackage { \CurrentOption } { XL-text }
                           \PassOptionsToPackage { \CurrentOption } { XL-title }
+                          \PassOptionsToPackage { \CurrentOption } { XL-report }
+                          \PassOptionsToPackage { \CurrentOption } { XL-bibliography }
                           \PassOptionsToPackage { \CurrentOption } { XL-management }
                         }
   }
@@ -84,6 +106,16 @@
 \bool_if:NT \l__xl_kit__title_enabled_bool
   {
     \RequirePackage { XL-title }
+  }
+
+\bool_if:NT \l__xl_kit__bibliography_enabled_bool
+  {
+    \RequirePackage { XL-bibliography }
+  }
+
+\bool_if:NT \l__xl_kit__report_enabled_bool
+  {
+    \RequirePackage { XL-report }
   }
 
 \hook_gput_code:nnn { begindocument/before } { XL-kit }
@@ -727,6 +759,31 @@
 \newcommand{\dlegendre}[3][]{\genlegendre{0}{#1}{\,#2\,}{\,#3\,}}
 \newcommand{\tlegendre}[3][]{\genlegendre{1}{#1}{\,#2\,}{\,#3\,}}
 
+% pentagon, hexagon, etc.
+\ExplSyntaxOff
+\AtBeginDocument
+  {
+    \let\pentagon\relax
+    \let\hexagon\relax
+    \newcommand*\pentagon[1][]{\tikz[baseline=-0.333em,#1]{
+      \draw [line width=0.075em]
+          (18:0.5em) -- (90:0.5em) -- (162:0.5em) -- (234:0.5em)
+          -- (306:0.5em) -- cycle;
+    }}
+    \newcommand*\hexagon[1][]{\tikz[baseline=-0.333em,#1]{
+      \draw [line width=0.075em]
+        (0:0.5em) -- (60:0.5em) -- (120:0.5em) -- (180:0.5em)
+        -- (240:0.5em) -- (300:0.5em) -- cycle;
+    }}
+    \newcommand*\mixedpentagon[1][]{\tikz[baseline=-0.333em,#1]{
+      \draw [line width=0.05em,densely dotted]
+          (18:0.5em) -- (90:0.5em) -- (162:0.5em) -- (234:0.5em)
+          -- (306:0.5em) -- cycle;
+      \draw [line width=0.075em] (234:0.5em) -- (306:0.5em);
+    }}
+  }
+\ExplSyntaxOn
+
 %%==================================================
 %%  Highlight
 %%==================================================
@@ -958,6 +1015,139 @@
 \cs_undefine:N \__scontents_abstract_env_end:
 \newenvsc { abstract } [ store-env = projlib-author-abstract, print-env = false ]
 %</XL-title>
+%
+%<*XL-report>
+\keys_define:nn { XL-report }
+  {
+    , unknown .code:n = {}
+  }
+\ProcessKeyOptions [ XL-report ]
+
+%%==================================================
+%%  Report title
+%%==================================================
+\NewDocumentCommand \reporttitle { O{} m }
+  {
+    \tl_if_blank:nTF { #1 }
+      {
+        \title{#2}
+      }
+      {
+        \title{{\smaller\MakeUppercase{#1}}\\[.333\baselineskip]#2}
+      }
+  }
+
+%%==================================================
+%%  Page # of ##
+%%==================================================
+\RequirePackage { projlib-language }
+\RequirePackage { fancyhdr }
+\RequirePackage { lastpage }
+
+\projlib_langauge_define_multilingual_text:Nn \l__xl_report_page_of_total_tl
+  {
+    , EN = { Page \nobreakspace \,\thepage\, \nobreakspace of \nobreakspace \,\pageref*{LastPage} }
+    , FR = { Page \nobreakspace \,\thepage\, \nobreakspace sur \nobreakspace \,\pageref*{LastPage} }
+    , DE = { Seite \nobreakspace \,\thepage\, \nobreakspace von \nobreakspace \,\pageref*{LastPage} }
+    , IT = { Pagina \nobreakspace \,\thepage\, \nobreakspace di \nobreakspace \,\pageref*{LastPage} }
+    , PT = { Página \nobreakspace \,\thepage\, \nobreakspace de \nobreakspace \,\pageref*{LastPage} }
+    , BR = { Página \nobreakspace \,\thepage\, \nobreakspace de \nobreakspace \,\pageref*{LastPage} }
+    , ES = { Página \nobreakspace \,\thepage\, \nobreakspace de \nobreakspace \,\pageref*{LastPage} }
+    , CN = { 第 \,\thepage\, 页，共 \,\pageref*{LastPage}\, 页 }
+    , TC = { 第 \,\thepage\, 頁，共 \,\pageref*{LastPage}\, 頁 }
+    , JP = { ページ \nobreakspace \,\thepage\, / \,\pageref*{LastPage} }
+    , RU = { Страница \nobreakspace \,\thepage\, \nobreakspace из \nobreakspace \,\pageref*{LastPage} }
+  }
+
+\fancypagestyle { fancy }
+  {
+    \if@twoside
+      \fancyfoot[RO,LE]{\small\color{main-text!27!paper} \l__xl_report_page_of_total_tl }
+    \else
+      \fancyfoot[R]{\small\color{main-text!27!paper} \l__xl_report_page_of_total_tl }
+    \fi
+  }
+\pagestyle { fancy }
+
+%%==================================================
+%%  Bibliography
+%%==================================================
+\RequirePackage { XL-bibliography }
+\AtBeginBibliography{\vspace*{0.3\baselineskip}}
+%</XL-report>
+%
+%<*XL-bibliography>
+\keys_define:nn { XL-bibliography }
+  {
+    , backref .bool_set:N = \l__xl_bibliography_backref_bool
+    , backref .initial:n  = { false }
+
+    , unknown .code:n = {}
+  }
+\ProcessKeyOptions [ XL-bibliography ]
+
+\bool_if:NT \l__xl_bibliography_backref_bool
+  {
+    \PassOptionsToPackage { backref = true } { biblatex }
+  }
+
+\PassOptionsToPackage {
+    citestyle = alphabetic,
+    style = alphabetic,
+    giveninits = true,
+    url = false,
+    doi = false,
+    isbn = false,
+    defernumbers = true,
+    % backref = true,
+    maxbibnames = 99,
+    maxcitenames = 99,
+    maxnames = 99,
+    maxalphanames = 99,
+} { biblatex }
+\RequirePackage { biblatex }
+
+% https://tex.stackexchange.com/a/491989
+\DeclareSourcemap{
+  \maps[datatype=bibtex, overwrite]{
+    \map{
+      \step[fieldset=address, null]
+      \step[fieldset=location, null]
+    }
+  }
+}
+% https://tex.stackexchange.com/a/249025
+\DeclareFieldFormat{journaltitle}{\mkbibemph{#1}\isdot}
+\renewbibmacro*{journal+issuetitle}{%
+  \usebibmacro{journal}%
+  \setunit*{\addcomma\space}%
+  \iffieldundef{series}
+    {}
+    {\newunit
+     \printfield{series}%
+     \setunit{\addspace}}%
+  \usebibmacro{volume+number+eid}%
+  \setunit{\addspace}%
+  \usebibmacro{issue+date}%
+  \setunit{\addcolon\space}%
+  \usebibmacro{issue}%
+  \newunit}
+\DeclareFieldFormat[article]{volume}{\bibstring{jourvol}\addnbspace #1}
+\DeclareFieldFormat[article]{number}{\bibstring{number}\addnbspace #1}
+\renewbibmacro*{volume+number+eid}{%
+  \printfield{volume}%
+  \setunit{\addcomma\space}%
+  \printfield{number}%
+  \setunit{\addcomma\space}%
+  \printfield{eid}}
+
+% \DefineBibliographyStrings{french}{%
+%   pages = {pp\adddot},
+% }
+\DefineBibliographyExtras{french}{%
+  \protected\def\bibrangedash{%
+    \textendash\penalty\hyphenpenalty}}
+%</XL-bibliography>
 %
 %<*XL-management>
 \keys_define:nn { XL-management }
@@ -1199,50 +1389,6 @@
           }
       }
   }
-
-% Temporary fix for cleveref in order to work with xr-hyper
-% See https://tex.stackexchange.com/a/708445
-\def\cref@getref#1#2{%
-  \expandafter\let\expandafter#2\csname r@#1@cref\endcsname%
-  \expandafter\expandafter\expandafter\def%
-    \expandafter\expandafter\expandafter#2%
-    \expandafter\expandafter\expandafter{%
-      \expandafter\@firstoffive#2}}% <-------- five
-\def\cpageref@getref#1#2{%
-  \expandafter\let\expandafter#2\csname r@#1@cref\endcsname%
-  \expandafter\expandafter\expandafter\def%
-    \expandafter\expandafter\expandafter#2%
-    \expandafter\expandafter\expandafter{%
-      \expandafter\@secondoffive#2}}% <----------- five
-\AtBeginDocument{%
-  \def\label@noarg#1{%
-    \cref@old@label{#1}%
-    \@bsphack%
-    \edef\@tempa{{page}{\the\c@page}}%
-    \setcounter{page}{1}%
-    \edef\@tempb{\thepage}%
-    \expandafter\setcounter\@tempa%
-    \cref@constructprefix{page}{\cref@result}%
-    \protected@write\@auxout{}%
-      {\string\newlabel{#1@cref}{{\cref@currentlabel}%
-      {[\@tempb][\arabic{page}][\cref@result]\thepage}{}{}{}}}% <----- five
-    \@esphack}%
-  \def\label@optarg[#1]#2{%
-    \cref@old@label{#2}%
-    \@bsphack%
-    \edef\@tempa{{page}{\the\c@page}}%
-    \setcounter{page}{1}%
-    \edef\@tempb{\thepage}%
-    \expandafter\setcounter\@tempa%
-    \cref@constructprefix{page}{\cref@result}%
-    \protected@edef\cref@currentlabel{%
-      \expandafter\cref@override@label@type%
-        \cref@currentlabel\@nil{#1}}%
-    \protected@write\@auxout{}%
-      {\string\newlabel{#2@cref}{{\cref@currentlabel}%
-      {[\@tempb][\arabic{page}][\cref@result]\thepage}{}{}{}}}% <------- five
-    \@esphack}%
-}
 %</XL-management>
 
 \endinput
